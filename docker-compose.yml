@@ -39,6 +39,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        CLOAKBROWSER_LICENSE_KEY: ${CLOAKBROWSER_LICENSE_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,6 +54,8 @@ services:
       FALCON_LLM_MODEL: ${FALCON_LLM_MODEL:-}
       FALCON_LLM_BASE_URL: ${FALCON_LLM_BASE_URL:-}
       FALCON_LLM_PROXY: ${FALCON_LLM_PROXY:-}
+      # CloakBrowser 每次 launch 都校验 license；留空则镜像里是 Playwright Chromium。
+      CLOAKBROWSER_LICENSE_KEY: ${CLOAKBROWSER_LICENSE_KEY:-}
       DOCKER_HOST: tcp://127.0.0.1:2375
       DISPLAY: ":99"
     network_mode: "service:dind"

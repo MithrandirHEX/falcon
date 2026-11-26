@@ -38,6 +38,12 @@ RUN CGO_ENABLED=0 GOARCH="${TARGETARCH}" go build -tags embedui -trimpath -o /ou
 ########## 阶段 3：运行镜像（同原版：工具 + Playwright 预装）##########
 FROM python:3.12-slim-bookworm
 ARG NPM_REGISTRY=https://registry.npmmirror.com
+# CloakBrowser license（cb_...，免费档 1 并发 session）：
+#   docker compose build --build-arg CLOAKBROWSER_LICENSE_KEY=cb_xxx
+# 或在 .env 设 CLOAKBROWSER_LICENSE_KEY=cb_xxx（compose 已把该值同时传给
+# build arg 和运行时 env——浏览器每次 launch 都要校验，两边都得给）。
+# 留空则跳过 cloakbrowser，回退装 Playwright 原版 Chromium（无 stealth 补丁）。
+ARG CLOAKBROWSER_LICENSE_KEY=
 # 运行层的全局 npm 装包与 chromium 下载同样走国内源（对全球网络同样可达）
 ENV npm_config_registry=$NPM_REGISTRY \
     PLAYWRIGHT_DOWNLOAD_HOST=https://cdn.npmmirror.com/binaries/playwright
@@ -51,9 +57,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && curl -fsSL https://download.docker.com/linux/static/stable/$(uname -m)/docker-27.5.1.tgz \
        | tar xz --strip-components=1 -C /usr/local/bin docker/docker \
     && rm -rf /var/lib/apt/lists/*
-# CloakBrowser: stealth Chromium (87 source-level C++ patches, bypasses bot detection).
-# Replaces Playwright's stock Chromium which gets fingerprinted by WAFs.
-# Also install agent-browser CLI for browser automation via CDP.
+# 浏览器层：有 CLOAKBROWSER_LICENSE_KEY 时装 stealth CloakBrowser
+# (87 source-level C++ patches, bypasses bot detection)；没有则回退
+# Playwright 原版 Chromium。agent-browser CLI 两种都驱动（CDP）。
 # Xvfb + noVNC for remote headed viewing when human intervention is needed.
 RUN apt-get update && apt-get install -y --no-install-recommends \
       xvfb x11vnc novnc websockify \
@@ -61,12 +67,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libcups2 libdrm2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libpango-1.0-0 \
       libcairo2 libasound2 libxshmfence1 libx11-xcb1 libxfixes3 libxkbcommon0 \
       fonts-liberation \
-    && npm install -g @playwright/mcp@latest cloakbrowser agent-browser \
-    && npx cloakbrowser install \
+    && npm install -g @playwright/mcp@latest playwright cloakbrowser agent-browser \
+    && if [ -n "$CLOAKBROWSER_LICENSE_KEY" ]; then \
+         npx cloakbrowser install; \
+       else \
+         npx playwright install chromium; \
+       fi \
     && rm -rf /var/lib/apt/lists/*
-RUN ln -sf /root/.cloakbrowser/chromium-*/chrome /root/.cloakbrowser/chrome
-ENV CHROME_PATH=/root/.cloakbrowser/chrome \
-    AGENT_BROWSER_EXECUTABLE_PATH=/root/.cloakbrowser/chrome \
+# 统一入口 /opt/falcon-chrome：cloakbrowser 优先，否则 playwright chromium。
+RUN CHROME_BIN="$(ls -d /root/.cloakbrowser/chromium-*/chrome 2>/dev/null || true)"; \
+    if [ -z "$CHROME_BIN" ]; then \
+      CHROME_BIN="$(find /root/.cache/ms-playwright -name chrome -type f | head -1)"; \
+    fi; \
+    [ -n "$CHROME_BIN" ] || { echo "no browser binary installed"; exit 1; }; \
+    ln -sf "$CHROME_BIN" /opt/falcon-chrome
+ENV CHROME_PATH=/opt/falcon-chrome \
+    AGENT_BROWSER_EXECUTABLE_PATH=/opt/falcon-chrome \
     AGENT_BROWSER_ARGS="--no-sandbox,--disable-gpu,--disable-dev-shm-usage,--remote-allow-origins=*"
 WORKDIR /app
 # 构建阶段产出的单二进制（内嵌前端）
