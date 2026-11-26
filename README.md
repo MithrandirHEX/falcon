@@ -10,7 +10,7 @@ Fork of [ARTEX](https://github.com/konanguyen/ARTEX) with native **Devin SWE-2 m
 
 - **Windsurf LLM provider** (`norma/llm/windsurf/windsurf.go`) — direct protobuf-over-HTTP to `server.codeium.com`, bypassing the Devin agent harness. FALCON's agent loop keeps full control over tool calling, message history, and system prompts.
 - **SWE-2 models** — `swe-2-high`, `swe-2-medium`, `swe-2-max` as selectable LLM profiles.
-- **CloakBrowser** — stealth Chromium with 87 C++ patches for evading bot detection.
+- **CloakBrowser** — stealth Chromium with 87 C++ patches for evading bot detection. *(Optional — needs a free license key; the build falls back to stock Playwright Chromium without one.)*
 - **Traffic capture fixes** — mitmproxy-based evidence collection for vulnerability findings.
 - **Protocol docs** — full reverse-engineering writeup at [`docs/windsurf-integration.md`](docs/windsurf-integration.md), reusable for connecting SWE-2 to any tool.
 
@@ -30,20 +30,27 @@ cd falcon
 # Create .env (only POSTGRES_PASSWORD is required)
 cat > .env <<'EOF'
 POSTGRES_PASSWORD=falcon-local-2026
+
+# Optional — free key at https://cloakbrowser.dev (1 concurrent session).
+# Leave unset to build with stock Playwright Chromium instead.
+# CLOAKBROWSER_LICENSE_KEY=cb_xxxxxxxx
 EOF
 
 # (Optional) Install Devin CLI and authenticate for SWE-2 support
 curl -fsSL https://cli.devin.ai/install.sh | bash
 devin auth login    # opens browser for Devin Pro auth
 
-# Build and start
-docker compose build    # ~6 min first time
+# Build and start — the image is always built locally from source
+# (there is no prebuilt image on Docker Hub; ~6 min, ~10 GB free disk)
+docker compose build
 docker compose up -d
 ```
 
 Or use the automated script: `./setup.sh` (handles all of the above interactively).
 
-**Web UI:** http://localhost:8787 — login with `FALCON` / `FALCON`
+**Web UI:** http://localhost:8787 — the **first visit redirects to `/setup`** where you create the admin password.
+
+> ⚠️ **Security note:** port `8787` binds `0.0.0.0`, so the UI is reachable by anyone on your network until you set the password. Set it immediately, or change the compose mapping to `127.0.0.1:8787:8787` to keep it localhost-only. (`8788`/`6080` are already localhost-only.)
 
 ### Adding SWE-2 as an LLM Profile
 
@@ -61,6 +68,15 @@ Skip the Devin CLI step. Configure OpenAI or Anthropic profiles instead:
 
 1. Add your API key to `.env` (`OPENAI_API_KEY=sk-...` or `ANTHROPIC_API_KEY=sk-...`)
 2. Or add profiles through the web UI under **System → LLM Profiles**
+
+Any **OpenAI-compatible endpoint** also works — point `FALCON_LLM_BASE_URL` at it via `.env`, e.g. Ollama Cloud:
+
+```bash
+OPENAI_API_KEY=<your-ollama-key>
+FALCON_LLM_PROVIDER=openai
+FALCON_LLM_BASE_URL=https://ollama.com/v1
+FALCON_LLM_MODEL=deepseek-v4.1-flash   # pick a model with tool-calling support
+```
 
 ### How the Windsurf Integration Works
 

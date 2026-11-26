@@ -84,7 +84,7 @@ docker compose up -d
 info ""
 info "FALCON is starting up. Give it ~30s for postgres + migrations."
 info "  Web UI:    http://localhost:8787"
-info "  Login:     username=FALCON  password=FALCON"
+info "  Login:     first visit redirects to /setup — create your admin password"
 info "  noVNC:     http://localhost:6080/vnc.html (headed browser viewing)"
 info ""
 info "Next steps:"
