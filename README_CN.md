@@ -4,7 +4,7 @@
 
 AI 自主渗透测试系统（Go 后端 + Next.js 前端）
 
-[English](README.md) | 简体中文 | [Tiếng Việt](README_VI.md)
+[English](README.md) | 简体中文
 
 
 🌐 **在线 Demo（模拟数据）**： [https://artex-demo.mhtsec.com](https://artex-demo.mhtsec.com)

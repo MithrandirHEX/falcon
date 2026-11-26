@@ -1,5 +1,4 @@
 export { en } from "./catalogs/en-us";
-export { vi } from "./catalogs/vi-vn";
 export { zhCN } from "./catalogs/zh-cn";
 export { type Dictionary, findMissingKeys, findStaleKeys, type TranslateValues, translate } from "./dictionary";
 export {

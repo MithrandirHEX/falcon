@@ -111,9 +111,6 @@ export default function LoginPage() {
             <DropdownMenuItem onClick={() => setLocale("zh-CN")} className={locale === "zh-CN" ? "font-bold" : ""}>
               简体中文
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLocale("vi-VN")} className={locale === "vi-VN" ? "font-bold" : ""}>
-              Tiếng Việt
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

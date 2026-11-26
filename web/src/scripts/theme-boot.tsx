@@ -94,11 +94,11 @@ export function ThemeBootScript() {
         var sidebarVariant = rawSidebarVariant || DEFAULTS.sidebar_variant;
         var sidebarCollapsible = rawSidebarCollapsible || DEFAULTS.sidebar_collapsible;
         var locale =
-          rawLocale === "en" ? "en-US" : rawLocale === "vi" ? "vi-VN" : rawLocale;
+          rawLocale === "en" ? "en-US" : rawLocale;
         var isValidLocale =
-          locale === "zh-CN" || locale === "en-US" || locale === "vi-VN";
+          locale === "zh-CN" || locale === "en-US";
         locale = isValidLocale ? locale : DEFAULTS.locale;
-        if (rawLocale === "en" || rawLocale === "vi") {
+        if (rawLocale === "en") {
           document.cookie = "locale=" + locale + "; max-age=31536000; path=/";
         }
 
@@ -115,7 +115,6 @@ export function ThemeBootScript() {
 
         var titles = {
           "en-US": "FALCON — Autonomous Penetration Testing Console",
-          "vi-VN": "FALCON — Bảng điều khiển kiểm thử thâm nhập tự động",
           "zh-CN": "FALCON — 自主渗透测试控制台"
         };
         if (titles[locale]) {

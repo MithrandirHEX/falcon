@@ -14,7 +14,6 @@ import { createContext, useContext } from "react";
 import { setClientCookie } from "@/lib/cookie.client";
 
 import { en } from "./catalogs/en-us";
-import { vi } from "./catalogs/vi-vn";
 import { zhCN } from "./catalogs/zh-cn";
 import { type Dictionary, translate } from "./dictionary";
 import { DEFAULT_LOCALE, type Locale, resolveLocale, toBcp47 } from "./locale";
@@ -25,7 +24,6 @@ const COOKIE_DAYS = 365;
 const CATALOGS: Record<Locale, Dictionary> = {
   "zh-CN": zhCN,
   "en-US": en,
-  "vi-VN": vi,
 };
 
 /**
@@ -61,7 +59,6 @@ export function getLocale(): Locale {
 
 const DOCUMENT_TITLES: Record<Locale, string> = {
   "en-US": "FALCON — Autonomous Penetration Testing Console",
-  "vi-VN": "FALCON — Bảng điều khiển kiểm thử thâm nhập tự động",
   "zh-CN": "FALCON — 自主渗透测试控制台",
 };
 

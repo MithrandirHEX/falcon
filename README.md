@@ -108,7 +108,7 @@ cp docker-compose.override.yml.example docker-compose.override.yml
 
 Autonomous AI Penetration Testing System (Go backend + Next.js frontend)
 
-English | [简体中文](README_CN.md) | [Tiếng Việt](README_VI.md)
+English | [简体中文](README_CN.md)
 
 📦 **This repository is the final pure-source backup of ARTEX. The original Docker image `autumn27/artex` is gone; images are now self-maintained by this repository as `falcon` (Docker Hub). If the pull fails, run `docker compose build` to build locally from pure source — no external prebuilt dependencies.**
 

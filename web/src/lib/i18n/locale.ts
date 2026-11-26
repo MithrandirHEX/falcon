@@ -1,7 +1,7 @@
 /**
  * Supported UI locales.
  *
- * FALCON ships three languages. `zh-CN` is the source language: every message
+ * FALCON ships two languages. `zh-CN` is the source language: every message
  * catalog is keyed by its original Chinese string, so a missing translation
  * degrades gracefully back to Chinese instead of rendering a raw key.
  */
@@ -9,7 +9,6 @@
 export const LOCALE_OPTIONS = [
   { value: "zh-CN", nativeLabel: "简体中文", englishLabel: "Simplified Chinese" },
   { value: "en-US", nativeLabel: "English", englishLabel: "English" },
-  { value: "vi-VN", nativeLabel: "Tiếng Việt", englishLabel: "Vietnamese" },
 ] as const;
 
 export const LOCALE_VALUES = LOCALE_OPTIONS.map((o) => o.value);
@@ -30,7 +29,6 @@ export function isLocale(value: unknown): value is Locale {
 
 export function resolveLocale(value: unknown): Locale {
   if (value === "en") return "en-US";
-  if (value === "vi") return "vi-VN";
   return isLocale(value) ? value : DEFAULT_LOCALE;
 }
 
